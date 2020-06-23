@@ -23,10 +23,9 @@ connection.connect(function(err) {
 });
 
 const init = function() {
-    inquirer
-    .prompt({
-        type: "list",
+    inquirer.prompt({
         name: "startMenu",
+        type: "list",
         message: "What would you like to do?",
         choices: [
             "View all employees",
@@ -39,9 +38,7 @@ const init = function() {
             "Exit"
         ]
     })
-    .then(function(ans) {
-        //console.log(answer);
-      
+    .then(function(ans) { 
         switch (ans.startMenu) {
             case "View all employees":
                 viewEmps();
@@ -106,7 +103,43 @@ const viewDepts = function() {
 }
 
 const addEmp = function() {
-    
+    inquirer.prompt([
+        {
+            name: "firstName",
+            type: "input",
+            message: "What is the employee's first name?"
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "What is the employee's last name?"
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "What is the employee's role?",
+            choices: [
+                "Manager",
+                "Lawyer",
+                "Developer",
+                "Salesperson"
+            ]
+        },
+        {
+            name: "manager",
+            type: "input",
+            message: "Who is the employee's manager? (If none, leave blank)",
+            default: "NULL"
+        },
+    ]).then(res => {
+        connection.query("INSERT INTO employee SET ?", 
+            {
+                first_name: res.firstName, 
+                last_name: res.lastName, 
+                //role_id
+                //manager_id
+            })
+    })
 }
 
 const addRole = function() {

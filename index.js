@@ -127,7 +127,7 @@ const addEmp = function() {
         return Promise.all([roles, mans]);
     }).then(([roles, mans]) => {
         
-        mansArr.unshift('None');
+        mansArr.unshift("None");
     
         inquirer.prompt([
             {
@@ -156,14 +156,14 @@ const addEmp = function() {
             let roleID;
             let manID = null;
 
-            for (let i=0; i < roles.length; i++){
-                if (res.role === roles[i].title){
+            for (let i=0; i < roles.length; i++) {
+                if (res.role === roles[i].title) {
                     roleID = roles[i].id;
                 }
             }
 
-            for (let i=0; i < mans.length; i++){
-                if (res.manager === mans[i].emp){
+            for (let i=0; i < mans.length; i++) {
+                if (res.manager === mans[i].emp) {
                     manID = mans[i].id;
                 }
             }
@@ -191,12 +191,12 @@ const addRole = function() {
 
     }).then(depts => {
         
-        for (i=0; i < depts.length; i++){
+        for (let i=0; i < depts.length; i++) {
             deptArr.push(depts[i].name);
         }
 
         return depts;
-    }).then(dept => {
+    }).then(depts => {
         
         inquirer.prompt([
             {
@@ -219,9 +219,9 @@ const addRole = function() {
 
             let deptID;
 
-            for (let i=0; i < dept.length; i++){
-                if (res.dept == dept[i].name){
-                    deptID = dept[i].id;
+            for (let i=0; i < depts.length; i++) {
+                if (res.dept === depts[i].name) {
+                    deptID = depts[i].id;
                 }
             }
 
@@ -259,5 +259,66 @@ const addDept = function() {
 }
 
 const updateRole = function() {
-    
+    let empArr = [];
+    let roleArr = [];
+
+    sqlProm.createConnection(connProps).then(con => {
+        return Promise.all([
+
+            con.query("SELECT * FROM role"), 
+            con.query("SELECT employee.id, concat(employee.first_name, ' ' ,  employee.last_name) AS emp FROM employee")
+        ]);
+    }).then(([roles, emps]) => {
+
+        for (let i=0; i < roles.length; i++) {
+            roleArr.push(roles[i].title);
+        }
+
+        for (let i=0; i < emps.length; i++) {
+            empArr.push(emps[i].emp);
+        }
+
+        return Promise.all([roles, emps]);
+    }).then(([roles, emps]) => {
+
+        inquirer.prompt([
+            {
+                name: "emp",
+                type: "list",
+                message: "Which employee would you like to update?",
+                choices: empArr
+            }, {
+                name: "role",
+                type: "list",
+                message: "What is their new role?",
+                choices: roleArr
+            }
+        ]).then(res => {
+
+                let roleID;
+                let empID;
+
+                for (let i=0; i < roles.length; i++) {
+                    if (res.role === roles[i].title) {
+                        roleID = roles[i].id;
+                    }
+                }
+
+                for (let i=0; i < emps.length; i++) {
+                    if (res.emp === emps[i].emp) {
+                        empID = emps[i].id;
+                    }
+                }
+                
+                connection.query("UPDATE employee SET ? WHERE ?",
+                    [
+                        {role_id: roleID},
+                        {id: empID}
+                    ], function(err, res) {
+                    if(err) return err;
+
+                    init();
+                })
+        })
+    })
 }

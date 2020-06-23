@@ -41,7 +41,7 @@ const init = function() {
             "Exit"
         ]
     })
-    .then(function(ans) { 
+    .then(ans => { 
         switch (ans.startMenu) {
             case "View all employees":
                 viewEmps();
@@ -189,14 +189,14 @@ const addRole = function() {
 
         return con.query("SELECT * FROM department");
 
-    }).then((depts) => {
+    }).then(depts => {
         
         for (i=0; i < depts.length; i++){
             deptArr.push(depts[i].name);
         }
 
         return depts;
-    }).then((dept) => {
+    }).then(dept => {
         
         inquirer.prompt([
             {
@@ -215,7 +215,7 @@ const addRole = function() {
                 message: "Which department is this role under?",
                 choices: deptArr
             }
-        ]).then((res) => {
+        ]).then(res => {
 
             let deptID;
 
@@ -240,7 +240,22 @@ const addRole = function() {
 }
 
 const addDept = function() {
-    
+    inquirer.prompt(
+        {
+            name: "dept",
+            type: "input",
+            message: "What is the name of the department?"
+        }
+    ).then(res => {
+        connection.query("INSERT INTO departments SET ?",
+            {
+                name: res.dept
+            }, function(err,res) {
+                if (err) throw err;
+
+                init();
+            })
+    })
 }
 
 const updateRole = function() {

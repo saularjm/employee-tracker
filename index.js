@@ -73,7 +73,7 @@ const init = function() {
 
             case "Exit":
                 connection.end();
-                //break;
+                break;
         }
     });
 };

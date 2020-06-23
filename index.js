@@ -151,7 +151,7 @@ const addEmp = function() {
                 type: "input",
                 message: "Who is the employee's manager?",
                 choices: mansArr
-            },
+            }
         ]).then(res => {
             let roleID;
             let manID = null;
@@ -183,7 +183,60 @@ const addEmp = function() {
 }
 
 const addRole = function() {
-    
+    let deptArr = [];
+
+    sqlProm.createConnection(connProps).then((con) => {
+
+        return con.query("SELECT * FROM department");
+
+    }).then((depts) => {
+        
+        for (i=0; i < depts.length; i++){
+            deptArr.push(depts[i].name);
+        }
+
+        return depts;
+    }).then((dept) => {
+        
+        inquirer.prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "What is the role title?"
+            },
+            {
+                name: "salary",
+                type: "number",
+                message: "What is the salary for this role?"
+            },
+            {   
+                name: "dept",
+                type: "list",
+                message: "Which department is this role under?",
+                choices: deptArr
+            }
+        ]).then((res) => {
+
+            let deptID;
+
+            for (let i=0; i < dept.length; i++){
+                if (res.dept == dept[i].name){
+                    deptID = dept[i].id;
+                }
+            }
+
+            connection.query("INSERT INTO role SET ?",
+                {
+                    title: res.title,
+                    salary: res.salary,
+                    department_id: deptID
+                }, function(err,res) {
+                    if (err) throw err;
+
+                    init();
+                })
+        })
+    })
 }
 
 const addDept = function() {

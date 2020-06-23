@@ -73,7 +73,7 @@ const init = function() {
 
             case "Exit":
                 connection.end();
-                break;
+                //break;
         }
     });
 };
@@ -81,8 +81,9 @@ const init = function() {
 const viewEmps = function() {
     connection.query("SELECT * FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id", function(err,res) {
         if (err) throw err;
-
-        cTable(res);
+        
+        console.log("\n");
+        console.table(res);
     })
     init();
 }
@@ -91,7 +92,8 @@ const viewRoles = function() {
     connection.query("SELECT * FROM role", function(err,res) {
         if (err) throw err;
 
-        cTable(res);
+        console.log("\n");
+        console.table(res);
     })
     init();
 }
@@ -100,7 +102,8 @@ const viewDepts = function() {
     connection.query("SELECT * FROM department", function(err,res) {
         if (err) throw err;
 
-        cTable(res);
+        console.log("\n");
+        console.table(res);
     })
     init();
 }
@@ -116,11 +119,12 @@ const addEmp = function() {
             con.query("SELECT employee.id, concat(employee.first_name, ' ' ,  employee.last_name) AS emp FROM employee")
         ])
     }).then(([roles, mans]) => {
+
         for (let i=0; i < roles.length; i++){
             rolesArr.push(roles[i].title);
         }
 
-        for (let i=0; i < roles.length; i++){
+        for (let i=0; i < mans.length; i++){
             mansArr.push(mans[i].emp);
         }
 
@@ -148,7 +152,7 @@ const addEmp = function() {
             },
             {
                 name: "manager",
-                type: "input",
+                type: "list",
                 message: "Who is the employee's manager?",
                 choices: mansArr
             }
@@ -185,7 +189,7 @@ const addEmp = function() {
 const addRole = function() {
     let deptArr = [];
 
-    sqlProm.createConnection(connProps).then((con) => {
+    sqlProm.createConnection(connProps).then(con => {
 
         return con.query("SELECT * FROM department");
 

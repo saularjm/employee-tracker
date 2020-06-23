@@ -1,20 +1,23 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
+const sqlProm = require("promise-mysql");
 
-const connection = mysql.createConnection({
-  host: "localhost",
+const connProps = {
+    host: "localhost",
+  
+    // Your port; if not 3306
+    port: 3306,
+  
+    // Your username
+    user: "root",
+  
+    // Your password
+    password: "root",
+    database: "employee_trackerDB"
+};
 
-  // Your port; if not 3306
-  port: 3306,
-
-  // Your username
-  user: "root",
-
-  // Your password
-  password: "root",
-  database: "employee_trackerDB"
-});
+const connection = mysql.createConnection(connProps);
 
 connection.connect(function(err) {
   if (err) throw err;
@@ -103,42 +106,79 @@ const viewDepts = function() {
 }
 
 const addEmp = function() {
-    inquirer.prompt([
-        {
-            name: "firstName",
-            type: "input",
-            message: "What is the employee's first name?"
-        },
-        {
-            name: "lastName",
-            type: "input",
-            message: "What is the employee's last name?"
-        },
-        {
-            name: "role",
-            type: "list",
-            message: "What is the employee's role?",
-            choices: [
-                "Manager",
-                "Lawyer",
-                "Developer",
-                "Salesperson"
-            ]
-        },
-        {
-            name: "manager",
-            type: "input",
-            message: "Who is the employee's manager? (If none, leave blank)",
-            default: "NULL"
-        },
-    ]).then(res => {
-        connection.query("INSERT INTO employee SET ?", 
+    let rolesArr = [];
+    let mansArr = [];
+
+    // https://github.com/CodeFoodPixels/node-promise-mysql
+    sqlProm.createConnection(connProps).then(con => {
+        return Promise.all([
+            con.query("SELECT * FROM role"),
+            con.query("SELECT employee.id, concat(employee.first_name, ' ' ,  employee.last_name) AS emp FROM employee")
+        ])
+    }).then(([roles, mans]) => {
+        for (let i=0; i < roles.length; i++){
+            rolesArr.push(roles[i].title);
+        }
+
+        for (let i=0; i < roles.length; i++){
+            mansArr.push(mans[i].emp);
+        }
+
+        return Promise.all([roles, mans]);
+    }).then(([roles, mans]) => {
+        
+        mansArr.unshift('None');
+    
+        inquirer.prompt([
             {
-                first_name: res.firstName, 
-                last_name: res.lastName, 
-                //role_id
-                //manager_id
-            })
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?"
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?"
+            },
+            {
+                name: "role",
+                type: "list",
+                message: "What is the employee's role?",
+                choices: rolesArr
+            },
+            {
+                name: "manager",
+                type: "input",
+                message: "Who is the employee's manager?",
+                choices: mansArr
+            },
+        ]).then(res => {
+            let roleID;
+            let manID = null;
+
+            for (let i=0; i < roles.length; i++){
+                if (res.role === roles[i].title){
+                    roleID = roles[i].id;
+                }
+            }
+
+            for (let i=0; i < mans.length; i++){
+                if (res.manager === mans[i].emp){
+                    manID = mans[i].id;
+                }
+            }
+            connection.query("INSERT INTO employee SET ?", 
+                {
+                    first_name: res.firstName, 
+                    last_name: res.lastName, 
+                    role_id: roleID,
+                    manager_id: manID
+                }, function(err,res) {
+                    if (err) throw err;
+
+                    init();
+                })
+        })
     })
 }
 

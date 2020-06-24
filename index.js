@@ -314,10 +314,10 @@ const updateRole = function() {
                     }
                 }
                 
-                connection.query("UPDATE employee SET ? WHERE ?",
+                connection.query("UPDATE employee SET ? WHERE employee.id = ?",
                     [
                         {role_id: roleID},
-                        {id: empID}
+                        empID
                     ], function(err, res) {
                     if(err) return err;
 

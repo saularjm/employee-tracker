@@ -43,7 +43,7 @@ the necessary information in the database.
 ## Output
 
 - Check out a video of the app's functionality here:
-    - 
+    - https://drive.google.com/file/d/1CPPLHGA1WZwqO8aAF07_W0A6Czec9PtU/view?usp=sharing
 
 ## Contributions
 

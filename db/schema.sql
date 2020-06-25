@@ -1,15 +1,18 @@
+-- Set up and use employee_trackerDB
 DROP DATABASE IF EXISTS employee_trackerDB;
 
 CREATE DATABASE employee_trackerDB;
 
 USE employee_trackerDB;
 
+-- Create department table
 CREATE TABLE department (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(32),
   PRIMARY KEY (id)
 );
 
+-- Create role table
 CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(32),
@@ -19,6 +22,7 @@ CREATE TABLE role (
   FOREIGN KEY (department_id) REFERENCES department (id)
 );
 
+-- Create employee table
 CREATE TABLE employee (
   id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(32),

@@ -113,7 +113,6 @@ const addEmp = function() {
     let rolesArr = [];
     let mansArr = [];
 
-    // https://github.com/CodeFoodPixels/node-promise-mysql
     sqlProm.createConnection(connProps).then(con => {
         return Promise.all([
             con.query("SELECT * FROM role"),

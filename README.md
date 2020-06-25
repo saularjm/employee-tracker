@@ -7,6 +7,7 @@
 - [Usage](#Usage)
 - [Methods/Tech](#Methods/Tech)
 - [Output](#Output)
+- [Contributions](#Contributions)
 
 ## Description
 

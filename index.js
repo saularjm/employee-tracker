@@ -82,7 +82,7 @@ const init = function() {
             case "Exit":
                 // Disconnect from DB
                 connection.end();
-                break;
+                return;
         }
     });
 };
